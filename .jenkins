@@ -1,0 +1,42 @@
+#!/usr/bin/env groovy
+
+pipeline {
+
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Publish to PyPi') {
+            when {
+                buildingTag()
+            }
+            environment {
+                TWINE_USERNAME = 'vaporio'
+                TWINE_PASSWORD = credentials('twine-password')
+            }
+            steps {
+                sh 'tox -e publish'
+            }
+        }
+
+        stage('GitHub Release') {
+            when {
+                buildingTag()
+            }
+            environment {
+                GITHUB_USER = 'vapor-ware'
+                GITHUB_TOKEN = credentials('vio-bot-gh-token')
+                GITHUB_REPONAME = 'fake-rpigpio'
+            }
+            steps {
+                sh 'docker run --rm -v ${WORKSPACE}:/repo edaniszewski/ghr -u ${GITHUB_USER} -r ${GITHUB_REPONAME} -t ${GITHUB_TOKEN} -replace ${TAG_NAME} dist/'
+            }
+        }
+
+    }
+}
