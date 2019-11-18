@@ -1,5 +1,7 @@
 """Fake package to mimic RPi.GPIO"""
 
+from random import randint
+
 
 class _FakeGPIO(object):
 
@@ -47,14 +49,14 @@ class _FakeGPIO(object):
     def cleanup(self, channel=None):
         pass
 
-    def setup(self, channel, direction, pull_up_down=PUD_OFF, initial=None):
+    def setup(self, channel, direction, initial=0, pull_up_down=PUD_OFF):
         pass
 
     def output(self, channel, value):
         pass
 
     def input(self, channel):
-        pass
+        return randint(0, 1)
 
     def setmode(self, mode):
         pass
@@ -72,13 +74,13 @@ class _FakeGPIO(object):
         pass
 
     def event_detected(self, channel):
-        pass
+        return False
 
     def wait_for_edge(self, channel, edge, bouncetime=None, timeout=None):
         pass
 
     def gpio_function(self, channel):
-        pass
+        return GPIO.OUT
 
     def setwarnings(self, state):
         pass
